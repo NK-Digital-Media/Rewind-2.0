@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>REWIND AI | Meet Your Past</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: #0b0b0b; color: white; font-family: 'Segoe UI', sans-serif; display: flex; align-items: center; justify-content: center; min-height: 100vh; }
+        .card { width: 90%; max-width: 400px; background: #1a1a1a; padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 1px solid #333; text-align: center; }
+        h1 { color: #f1c40f; letter-spacing: 2px; margin-bottom: 10px; }
+        .status { font-size: 14px; color: #888; margin-bottom: 20px; }
+        #chat-display { background: #222; padding: 15px; border-radius: 10px; min-height: 100px; margin-bottom: 20px; font-style: italic; color: #ddd; border-left: 4px solid #f1c40f; text-align: left; }
+        input { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #444; background: #111; color: white; margin-bottom: 15px; outline: none; }
+        button { width: 100%; padding: 15px; border-radius: 10px; border: none; background: #f1c40f; color: black; font-weight: bold; font-size: 16px; cursor: pointer; transition: 0.3s; }
+        button:active { transform: scale(0.98); }
+    </style>
+</head>
+<body>
+
+    <div class="card">
+        <h1>REWIND AI</h1>
+        <p class="status">Apne bachpan se ek sawal puchein</p>
+
+        <div id="chat-display">...intezar kar raha hoon...</div>
+
+        <input type="text" id="userInput" placeholder="Yahan likhein...">
+        <button onclick="talkToPast()">Magic Dekhein</button>
+    </div>
+
+    <script>
+        async function talkToPast() {
+            const input = document.getElementById('userInput');
+            const display = document.getElementById('chat-display');
+            const userMessage = input.value;
+
+            if(!userMessage) return alert("Bhai, pehle kuch likho toh!");
+
+            display.innerText = "Soch raha hoon... ⏳";
+            
+            // TERI API KEY
+            const KEY = "AIzaSyDKGIZzvE879788VUEERARohpxgoLHgQIc";
+            const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${KEY}`;
+
+            try {
+                const response = await fetch(API_URL, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        contents: [{
+                            parts: [{ text: `Tu ek 8 saal ka pyara aur masoom bachcha hai. Tera naam Neeraj ka bachpan hai. User tumse kuch pooch raha hai: "${userMessage}". Use bahut hi emotional aur chota sa jawab Hindi mein de.` }]
+                        }]
+                    })
+                });
+
+                const data = await response.json();
+                
+                if(data.candidates && data.candidates[0].content.parts[0].text) {
+                    display.innerText = data.candidates[0].content.parts[0].text;
+                    input.value = ""; // Clear input
+                } else {
+                    display.innerText = "Maaf karna, main thoda confuse ho gaya. Phir se poochiye.";
+                }
+
+            } catch (error) {
+                console.error(error);
+                display.innerText = "Error: API connect nahi hui. Shayad key block ho gayi hai.";
+            }
+        }
+    </script>
+</body>
+</html>
